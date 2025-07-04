@@ -1,5 +1,7 @@
 import products.Shippable;
 
+import java.util.ArrayList;
+
 public class ShippingService {
     private double costPerKg;
 
@@ -10,8 +12,13 @@ public class ShippingService {
         this.costPerKg = costPerKg;
     }
 
-    public double calculateShippingCost(Shippable[] shippable) {
-        if (shippable == null || shippable.length == 0) {
+    public double calculateShippingCost(ArrayList<Shippable> shippable) {
+        double totalWeight = getTotalWeight(shippable);
+        return totalWeight * costPerKg;
+    }
+
+    public double getTotalWeight(ArrayList<Shippable> shippable) {
+        if (shippable == null || shippable.isEmpty()) {
             return 0.0; // No items to ship
         }
         double totalWeight = 0.0;
@@ -20,7 +27,7 @@ public class ShippingService {
                 totalWeight += item.getWeight();
             }
         }
-        return totalWeight * costPerKg;
+        return totalWeight;
     }
 
 }

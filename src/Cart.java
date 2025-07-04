@@ -1,12 +1,18 @@
-import products.Decorator.Expirable;
-import products.Decorator.Shippable;
+import products.Expirable;
 import products.Product;
+import products.Shippable;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class Cart {
     private HashMap<Product, CartItem> items;
     private ShippingService shippingService;
     private Customer customer;
+
+    private ArrayList<Shippable> shippableItems;
 
     public Cart(ShippingService shippingService, Customer customer) {
         this.items = new HashMap<>();
@@ -35,24 +41,18 @@ public class Cart {
         if (items.isEmpty()) {
             throw new IllegalStateException("Cart is empty. Cannot proceed to checkout.");
         }
-
         double subtotal = calculateSubtotal();
-        Shippable[] shippableItems = items.values().stream()
-                .filter(item -> item.product instanceof Shippable)
-                .map(item -> (Shippable) item.product)
-                .toArray(Shippable[]::new);
 
-        double shippingCost = shippingService.calculateShippingCost(shippableItems);
+        setShippableItems();
+        double shippingCost = getShippingCost();
+
         double total = subtotal + shippingCost;
-
         customer.deductBalance(total);
 
-        System.out.println("Order Summary:");
-        System.out.println("Subtotal: " + subtotal);
-        System.out.println("Shipping Cost: " + shippingCost);
-        System.out.println("Total: " + total);
+        printCheckout(subtotal, shippingCost, total);
 
         items.clear();
+        shippableItems = null; // Clear shippable items after checkout
     }
 
     private double calculateSubtotal() {
@@ -62,6 +62,40 @@ public class Cart {
         }
         return total;
     }
+
+    private void setShippableItems() {
+        shippableItems = items.values().stream()
+                .filter(item -> item.product instanceof Shippable)
+                .flatMap(item ->
+                        Collections.nCopies(item.quantity, (Shippable) item.product)
+                                .stream() // Convert List<Shippable> to Stream<Shippable>
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private double getShippingCost() {
+        return shippingService.calculateShippingCost(shippableItems);
+    }
+
+    private void printCheckout(double subtotal, double shippingCost, double total) {
+        StringBuilder shipmentNotice = new StringBuilder("** Shipment notice **\n");
+        StringBuilder checkoutReceipt = new StringBuilder("** Checkout receipt ** \n");
+
+        for (CartItem item : items.values()) {
+            shipmentNotice.append(item.addToShipmentNotice()).append("\n");
+            checkoutReceipt.append(item.addToCheckoutReceipt()).append("\n");
+        }
+        shipmentNotice.append("Total package weight ")
+                .append(shippingService.getTotalWeight(shippableItems)).append("kg\n");
+
+        checkoutReceipt.append("----------------------\n")
+                .append(String.format("Subtotal" + ": %.2f\n", subtotal))
+                .append(String.format("Shipping" + ": %.2f\n", shippingCost))
+                .append(String.format("Amount  " + ": %.2f\n", total));
+        System.out.println(shipmentNotice);
+        System.out.println(checkoutReceipt);
+    }
+
 
     class CartItem {
         Product product;
@@ -88,6 +122,17 @@ public class Cart {
             if (quantity > product.getQuantity()) {
                 throw new IllegalArgumentException("Quantity exceeds available stock. Available: " + product.getQuantity());
             }
+        }
+
+        public String addToShipmentNotice() {
+            if (!(product instanceof Shippable)) {
+                return "";
+            }
+            return quantity + "x " + product.getName() + "     " + ((Shippable) product).getWeight() * 1000 * quantity + "g";
+        }
+
+        public String addToCheckoutReceipt() {
+            return quantity + "x " + product.getName() + "     " + product.getPrice() * quantity;
         }
     }
 }
