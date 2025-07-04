@@ -1,8 +1,10 @@
 package products.productImpl;
 
+import products.Expirable;
+
 import java.time.LocalDateTime;
 
-public class ExpirableProduct extends BaseProduct {
+public class ExpirableProduct extends BaseProduct implements Expirable {
 
     private final LocalDateTime expirationDate;
 

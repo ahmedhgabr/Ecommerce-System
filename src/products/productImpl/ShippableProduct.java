@@ -1,6 +1,9 @@
 package products.productImpl;
 
-public class ShippableProduct extends BaseProduct {
+import products.Product;
+import products.Shippable;
+
+public class ShippableProduct extends BaseProduct implements Shippable {
 
     private double weight; // Weight in kilograms
 
