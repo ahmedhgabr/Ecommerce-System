@@ -1,6 +1,5 @@
 package products.productImpl;
 
-import products.Product;
 import products.Shippable;
 
 public class ShippableProduct extends BaseProduct implements Shippable {

@@ -1,8 +1,5 @@
-import products.Expirable;
-import products.ProductFactory;
-import products.Shippable;
-import products.productImpl.BaseProduct;
 import products.Product;
+import products.ProductFactory;
 
 import java.time.LocalDateTime;
 
