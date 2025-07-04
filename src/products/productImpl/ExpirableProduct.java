@@ -1,15 +1,13 @@
-package products.Decorator;
-
-import products.Product;
+package products.productImpl;
 
 import java.time.LocalDateTime;
 
-public class Expirable extends ProductDecorator {
+public class ExpirableProduct extends BaseProduct {
 
     private final LocalDateTime expirationDate;
 
-    public Expirable(Product product, LocalDateTime expirationDate) {
-        super(product);
+    public ExpirableProduct(String name, double price, int quantity, LocalDateTime expirationDate) {
+        super(name, price, quantity);
         if (expirationDate == null) {
             throw new IllegalArgumentException("Expiration date cannot be null");
         }

@@ -1,4 +1,4 @@
-import products.Decorator.Shippable;
+import products.Shippable;
 
 public class ShippingService {
     private double costPerKg;

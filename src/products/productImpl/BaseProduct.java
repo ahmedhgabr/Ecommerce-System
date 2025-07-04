@@ -1,4 +1,6 @@
-package products;
+package products.productImpl;
+
+import products.Product;
 
 public class BaseProduct implements Product {
 
@@ -8,10 +10,6 @@ public class BaseProduct implements Product {
      * Quantity of the product in stock.
      **/
     private int quantity;
-
-    public BaseProduct(String name, double price) {
-        this(name, price, 0);
-    }
 
     public BaseProduct(String name, double price, int quantity) {
         if (name == null || name.isEmpty()) {
